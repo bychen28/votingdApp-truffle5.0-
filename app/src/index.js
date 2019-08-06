@@ -40,15 +40,22 @@ const App = {
      await this.loadCandidates();
      this.setupCandidateRows();
      await this.populateTokenData();
-
      const { totalVotesFor } = this.voting.methods;
      let candidateNames = Object.keys(candidates);
-     console.log(candidateNames)  
-     for(var i = 0; i < candidateNames.length; i++) {
-         let name = candidateNames[i];
-         var count = await totalVotesFor(this.web3.utils.asciiToHex(name)).call();
-         console.log(count)
-         $("#" + candidates[name]).html(count);
+     console.log(candidateNames)
+     let that = this;
+     function sd(cn){
+        let name = cn;
+        let count = totalVotesFor(that.web3.utils.asciiToHex(name)).call().then(function(result) {
+            debugger;
+            console.log(count)
+            // console.log(count.toNumber())
+            $("#" + candidates[name]).html(result.toNumber());
+        });
+     }
+
+     for(let i = 0; i < candidateNames.length; i++) {
+        sd(candidateNames[i]);
      }
  },
  loadCandidates: async function() {
@@ -60,8 +67,9 @@ const App = {
      }
  },
  setupCandidateRows: function() {
-     Object.keys(candidates).forEach(function (candidate){
-         $("#candidate-rows").append("<tr><td>" + candidate + "</td><td id ='" + candidate[candidate] + "'></td></tr>");
+     Object.keys(candidates).forEach(function (candidate, index){
+         debugger;
+         $("#candidate-rows").append("<tr><td>" + candidate + "</td><td id='candidate-"+ index + "'></td></tr>");
      });
  },
  populateTokenData: async function() {
@@ -115,18 +123,23 @@ const App = {
         const { voterDetails } = this.voting.methods;
         var voter = await voterDetails(address).call();
         console.log(voter)
-        debugger
-        console.log(voter[1])
-        $("#").html(voter.methods._bigNumber)
-        for(var i = 0; i<voter.length;i++){
-            let voterInfo = voter[i]
-            $("#test").html(voterInfo);
-        };
+        var whoivotedfor = voter[1]
+        $("#test").html("Number of Times You Voted For Rama" + "----- " + whoivotedfor[0]['_hex'])
+        $("#test1").html("Number of Times You Voted For Nick" + "---- " + whoivotedfor[1]['_hex'])
+        $("#test2").html("Number of Times You Voted For Jose" + "-----" + whoivotedfor[2]['_hex'])
+        // for(var i = 0; i<whoivotedfor.length; i++){
+        //     var votesonwhom = whoivotedfor[i]['_hex']
+        //     console.log(whoivotedfor[i]['_hex'])
+        //     $("#test").html(votesonwhom)
+        //     $("#test").html(votesonwhom)
+        //     $("#test").html(votesonwhom)
+        // }
+        console.log(whoivotedfor) 
+        debugger; 
    }
 };
 
 window.App = App;
-
 window.addEventListener("load", function() {
  if (window.ethereum) {
   // use MetaMask's provider
